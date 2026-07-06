@@ -5,9 +5,8 @@ from datetime import datetime, timezone
 import requests
 from bs4 import BeautifulSoup
 
-import config
-import storage
-from agents.base_agent import BaseAgent
+from startup_pulse.core import config, storage
+from startup_pulse.agents.base import BaseAgent
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"

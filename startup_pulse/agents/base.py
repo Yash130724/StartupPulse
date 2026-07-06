@@ -1,7 +1,7 @@
 import abc
 from datetime import datetime
 
-import storage
+from startup_pulse.core import storage
 
 
 class BaseAgent(abc.ABC):

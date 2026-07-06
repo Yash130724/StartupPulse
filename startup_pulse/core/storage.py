@@ -2,7 +2,7 @@ import json
 import os
 from datetime import datetime, timedelta
 
-import config
+from startup_pulse.core import config
 
 
 def _ensure_dir(path: str):

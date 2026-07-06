@@ -2,7 +2,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-import config
+from startup_pulse.core import config
 
 
 def send_email(subject: str, html_body: str) -> bool:

@@ -2,16 +2,15 @@ import html
 import re
 from datetime import datetime
 
-import config
-import storage
+from startup_pulse.core import config, storage
 
-# Section definitions: (agent_name, display_title, color)
+# Section definitions: (agent_name, display_title, color, max_items_in_email)
 SECTIONS = [
-    ("news",    "AI News",                "#0984E3"),
-    ("papers",  "Research Papers",        "#6C5CE7"),
-    ("grants",  "Grants & Schemes",       "#00B894"),
-    ("funding", "Funding Opportunities",  "#E17055"),
-    ("github",  "GitHub Trending",        "#2D3436"),
+    ("news",    "AI News",                "#0984E3", 25),
+    ("papers",  "Research Papers",        "#6C5CE7", 20),
+    ("grants",  "Grants & Schemes",       "#00B894", 15),
+    ("funding", "Funding Opportunities",  "#E17055", 15),
+    ("github",  "GitHub Trending",        "#2D3436", 25),
 ]
 
 
@@ -116,7 +115,7 @@ def format_digest(date: datetime | None = None) -> tuple[str, str]:
     sections_html = ""
     total_items = 0
 
-    for agent_name, title, color in SECTIONS:
+    for agent_name, title, color, max_items in SECTIONS:
         items = storage.load_articles(agent_name, date)
         if not items:
             continue
@@ -125,14 +124,20 @@ def format_digest(date: datetime | None = None) -> tuple[str, str]:
         if agent_name == "news":
             items = _sort_news_tier1_first(items)
 
-        total_items += len(items)
+        total_collected = len(items)
+        display_items = items[:max_items]
+        total_items += total_collected
 
         if agent_name == "github":
-            items_html = "\n".join(_render_github_repo(r) for r in items)
+            items_html = "\n".join(_render_github_repo(r) for r in display_items)
         else:
-            items_html = "\n".join(_render_article(a) for a in items)
+            items_html = "\n".join(_render_article(a) for a in display_items)
 
-        sections_html += _render_section(title, color, items_html, len(items))
+        # Show how many were truncated
+        if total_collected > max_items:
+            items_html += f'\n            <p style="text-align:center;color:#999;font-size:12px;margin-top:8px;">...and {total_collected - max_items} more not shown</p>'
+
+        sections_html += _render_section(title, color, items_html, total_collected)
 
     if not sections_html:
         html_body = f"""<html><body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;margin:0;padding:0;background:#f4f4f8;">
@@ -163,7 +168,7 @@ def format_digest(date: datetime | None = None) -> tuple[str, str]:
 {sections_html}
             <!-- Footer -->
             <div style="border-top:1px solid #e8e8e8;margin-top:10px;padding-top:18px;text-align:center;">
-                <p style="font-size:11px;color:#aaa;margin:0;">Curated by Personal AI Assistant</p>
+                <p style="font-size:11px;color:#aaa;margin:0;">Curated by StartupPulse</p>
             </div>
         </div>
 

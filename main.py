@@ -5,9 +5,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-import emailer
-import formatter
-from agents import ALL_AGENTS, COLLECTIBLE_AGENTS
+from startup_pulse.delivery import emailer, formatter
+from startup_pulse.agents import ALL_AGENTS, COLLECTIBLE_AGENTS
 
 
 def collect_all() -> int:
@@ -33,7 +32,7 @@ def collect_agent(name: str) -> int:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Personal AI Assistant - Collect and digest")
+    parser = argparse.ArgumentParser(description="StartupPulse - Collect and digest")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--collect", action="store_true", help="Collect all agents")
     group.add_argument("--collect-agent", metavar="NAME", help="Collect a specific agent (news, papers, grants, funding, github)")

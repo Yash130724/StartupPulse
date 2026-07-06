@@ -126,5 +126,5 @@ NEWS_TIER1 = {
 # ---------------------------------------------------------------------------
 # Storage
 # ---------------------------------------------------------------------------
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "data")
 STORAGE_RETENTION_DAYS = 7

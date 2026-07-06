@@ -3,9 +3,8 @@ from datetime import datetime, timedelta, timezone
 
 import feedparser
 
-import config
-import storage
-from agents.base_agent import BaseAgent
+from startup_pulse.core import config, storage
+from startup_pulse.agents.base import BaseAgent
 
 
 class NewsAgent(BaseAgent):
