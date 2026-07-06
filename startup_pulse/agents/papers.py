@@ -59,6 +59,12 @@ class PapersAgent(BaseAgent):
             text = text[:497] + "..."
         return text
 
+    @staticmethod
+    def _is_relevant(title: str, summary: str) -> bool:
+        """Check if paper matches any PAPER_KEYWORDS."""
+        text = (title + " " + summary).lower()
+        return any(kw in text for kw in config.PAPER_KEYWORDS)
+
     def _fetch_feed(self, name: str, url: str) -> list[dict]:
         try:
             feed = feedparser.parse(url)
@@ -66,8 +72,8 @@ class PapersAgent(BaseAgent):
             print(f"  Error fetching {name}: {e}")
             return []
 
-        # 72h window so Monday runs catch Friday/weekend papers
-        cutoff = datetime.now(timezone.utc) - timedelta(hours=72)
+        # 24h window — one day of papers per run
+        cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
         papers = []
 
         for entry in feed.entries:
@@ -89,6 +95,10 @@ class PapersAgent(BaseAgent):
             if published and published < cutoff:
                 continue
 
+            # Only keep papers matching our keywords
+            if not self._is_relevant(title, summary):
+                continue
+
             conference_tag = self._detect_conference(title + " " + summary)
 
             papers.append({
@@ -101,4 +111,4 @@ class PapersAgent(BaseAgent):
                 "conference_tag": conference_tag,
             })
 
-        return papers
+        return papers[:30]  # Cap at 30 per feed
